@@ -93,3 +93,10 @@ if st.button("Analyze Niche"):
 
         for idea in ideas[:10]:
             st.markdown(f"- {idea}")    
+if not videos:
+    st.warning(
+        "⚠️ Unable to fetch YouTube data right now. "
+        "This may be due to API limits. "
+        "Viewer intent analysis works best with smaller keywords."
+    )
+    st.stop()

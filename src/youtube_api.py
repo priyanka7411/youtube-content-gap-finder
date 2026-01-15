@@ -1,6 +1,7 @@
 import os
 from googleapiclient.discovery import build
 from dotenv import load_dotenv
+from googleapiclient.errors import HttpError
 
 load_dotenv()
 
@@ -12,27 +13,27 @@ if not API_KEY:
 youtube = build("youtube", "v3", developerKey=API_KEY)
 
 
+
+
 def fetch_videos(keyword: str, max_results: int = 10) -> list:
-    """
-    Fetch basic YouTube video data for a given keyword.
-    Returns a list of dictionaries.
-    """
+    try:
+        request = youtube.search().list(
+            q=keyword,
+            part="snippet",
+            maxResults=min(max_results, 25),
+            type="video"
+        )
 
-    request = youtube.search().list(
-    q=keyword,
-    part="snippet",
-    maxResults=min(max_results, 25),
-    type="video"
-)
+        response = request.execute()
 
-
-    response = request.execute()
+    except HttpError as e:
+        # Graceful failure for V1
+        return []
 
     videos = []
 
     for item in response.get("items", []):
         snippet = item["snippet"]
-
         videos.append({
             "title": snippet["title"],
             "description": snippet["description"],
