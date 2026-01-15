@@ -41,62 +41,66 @@ max_results = st.slider(
 )
 
 if st.button("Analyze Niche"):
+
     if not keyword.strip():
         st.warning("Please enter a keyword.")
-    else:
-        with st.spinner("Analyzing YouTube videos..."):
-            videos = fetch_videos(keyword, max_results=max_results)
-            intent_counts = extract_intent_counts(videos)
+        st.stop()
 
-        st.success(f"Analyzed {len(videos)} videos")
+    with st.spinner("Analyzing YouTube videos..."):
+        videos = fetch_videos(keyword, max_results=max_results)
 
-        # ---------------- Existing Videos ----------------
-        st.subheader("📌 Existing Videos")
-        for i, video in enumerate(videos[:10], start=1):
-            st.markdown(f"**{i}. {video['title']}**")
-            st.caption(f"Channel: {video['channel']}")
-
-        # ---------------- Viewer Intent ----------------
-        st.divider()
-        st.subheader("🧠 Viewer Intent Found")
-
-        if intent_counts:
-            for intent, count in sorted(intent_counts.items(), key=lambda x: -x[1]):
-                st.write(f"**{intent}** → {count} videos")
-        else:
-            st.info("No strong intent signals found.")
-
-        # ---------------- Content Gaps ----------------
-        st.divider()
-        st.subheader("🚨 Content Gaps Identified")
-
-        gaps = identify_content_gaps(
-            intent_counts=intent_counts,
-            total_videos=len(videos)
+    # ✅ Graceful failure handling (V1)
+    if not videos:
+        st.warning(
+            "⚠️ Unable to fetch YouTube data right now.\n\n"
+            "This may be due to API limits or temporary restrictions.\n"
+            "Try a smaller or more specific keyword."
         )
+        st.stop()
 
-        if gaps:
-            for gap in gaps:
-                st.write(
-                    f"**{gap['intent']}** → {gap['count']} videos "
-                    f"({gap['ratio']*100:.0f}% coverage)"
-                )
-        else:
-            st.info("No major content gaps found.")
+    intent_counts = extract_intent_counts(videos)
 
-        # ---------------- Video Ideas ----------------
-        st.divider()
-        st.subheader("💡 Content Angles You Can Explore")
+    st.success(f"Analyzed {len(videos)} videos")
 
+    # ---------------- Existing Videos ----------------
+    st.subheader("📌 Existing Videos")
+    for i, video in enumerate(videos[:10], start=1):
+        st.markdown(f"**{i}. {video['title']}**")
+        st.caption(f"Channel: {video['channel']}")
 
-        ideas = generate_video_ideas(keyword, gaps, videos)
+    # ---------------- Viewer Intent ----------------
+    st.divider()
+    st.subheader("🧠 Viewer Intent Found")
 
-        for idea in ideas[:10]:
-            st.markdown(f"- {idea}")    
-if not videos:
-    st.warning(
-        "⚠️ Unable to fetch YouTube data right now. "
-        "This may be due to API limits. "
-        "Viewer intent analysis works best with smaller keywords."
+    if intent_counts:
+        for intent, count in sorted(intent_counts.items(), key=lambda x: -x[1]):
+            st.write(f"**{intent}** → {count} videos")
+    else:
+        st.info("No strong intent signals found.")
+
+    # ---------------- Content Gaps ----------------
+    st.divider()
+    st.subheader("🚨 Content Gaps Identified")
+
+    gaps = identify_content_gaps(
+        intent_counts=intent_counts,
+        total_videos=len(videos)
     )
-    st.stop()
+
+    if gaps:
+        for gap in gaps:
+            st.write(
+                f"**{gap['intent']}** → {gap['count']} videos "
+                f"({gap['ratio']*100:.0f}% coverage)"
+            )
+    else:
+        st.info("No major content gaps found.")
+
+    # ---------------- Content Angles ----------------
+    st.divider()
+    st.subheader("💡 Content Angles You Can Explore")
+
+    ideas = generate_video_ideas(keyword, gaps, videos)
+
+    for idea in ideas[:10]:
+        st.markdown(f"- {idea}")
