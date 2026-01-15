@@ -19,11 +19,12 @@ def fetch_videos(keyword: str, max_results: int = 10) -> list:
     """
 
     request = youtube.search().list(
-        part="snippet",
-        q=keyword,
-        type="video",
-        maxResults=max_results
-    )
+    q=keyword,
+    part="snippet",
+    maxResults=min(max_results, 25),
+    type="video"
+)
+
 
     response = request.execute()
 
