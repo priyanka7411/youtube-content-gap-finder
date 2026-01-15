@@ -1,7 +1,7 @@
 # 🎥 YouTube Content Gap Finder (V1)
 
 [![Python](https://img.shields.io/badge/Python-3.11-blue)](https://www.python.org/)
-[![Streamlit](https://img.shields.io/badge/Streamlit-Live%20Demo-orange)](https://share.streamlit.io/<your-app-url>)
+[![Streamlit](https://img.shields.io/badge/Streamlit-Live%20Demo-orange)](https://priyanka7411-youtube-content-gap-finder-app-ytsqv4.streamlit.app/)
 
 
 A niche-level analysis tool that helps YouTube creators identify **under-covered content angles** using viewer intent signals.
