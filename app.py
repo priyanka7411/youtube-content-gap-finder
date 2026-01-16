@@ -3,6 +3,10 @@ from src.youtube_api import fetch_videos
 from src.intent_analysis import extract_intent_counts
 from src.gap_analysis import identify_content_gaps
 from src.idea_engine import generate_video_ideas
+from src.topic_clustering import cluster_topics
+from src.topic_gap_analysis import identify_topic_gaps
+from data.sample_videos_v2 import sample_videos
+
 
 
 st.set_page_config(page_title="YouTube Content Gap Finder", layout="centered")
@@ -104,3 +108,33 @@ if st.button("Analyze Niche"):
 
     for idea in ideas[:10]:
         st.markdown(f"- {idea}")
+        
+        # =======================
+    
+    # V2: Topic Gap Analysis
+    # =======================
+
+    st.divider()
+    st.subheader("🧩 V2 – Topic Coverage & Gaps")
+
+    # Use cached/sample data for V2
+    topic_counts = cluster_topics(sample_videos)
+    topic_gaps = identify_topic_gaps(
+        topic_counts,
+        total_videos=len(sample_videos)
+    )
+
+    st.markdown("**Topic Coverage:**")
+    for topic, count in topic_counts.items():
+        st.write(f"- {topic}: {count} videos")
+
+    st.markdown("**Under-covered Topics (Gaps):**")
+    if topic_gaps:
+        for gap in topic_gaps:
+            st.write(
+                f"• **{gap['topic']}** → "
+                f"{gap['count']} videos "
+                f"({gap['coverage']*100:.0f}% coverage)"
+            )
+    else:
+        st.info("No major topic gaps identified.")
